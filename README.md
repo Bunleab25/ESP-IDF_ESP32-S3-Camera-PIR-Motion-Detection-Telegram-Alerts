@@ -326,41 +326,6 @@ PIR and Telegram tests should be added after those modules have been implemented
 - Check power stability and serial logs.
 - Test the stream and snapshot endpoints separately.
 
-## Roadmap
-
-### Phase 1 — Camera Streaming
-
-- [x] Initialize the camera.
-- [x] Start a local Wi-Fi access point.
-- [x] Serve a browser-based interface.
-- [x] Implement MJPEG streaming.
-- [x] Implement JPEG snapshot capture.
-
-### Phase 2 — PIR Motion Detection
-
-- [ ] Connect a PIR sensor to a suitable GPIO.
-- [ ] Implement motion-event handling.
-- [ ] Add configurable motion detection behavior.
-- [ ] Capture an image when motion is detected.
-- [ ] Test repeated triggers and false activations.
-
-### Phase 3 — Telegram Integration
-
-- [ ] Configure Telegram Bot API access.
-- [ ] Establish outbound network connectivity.
-- [ ] Send text notifications when motion is detected.
-- [ ] Upload captured images to Telegram.
-- [ ] Handle network failures and API errors.
-
-### Phase 4 — Reliability and Security
-
-- [ ] Remove default credentials.
-- [ ] Store secrets outside tracked source files.
-- [ ] Add appropriate access controls.
-- [ ] Improve connection recovery and error handling.
-- [ ] Document hardware-specific configurations.
-- [ ] Add repeatable integration tests.
-
 ## Security Considerations
 
 This project is currently intended for development and local testing.
