@@ -1,142 +1,392 @@
-# ESP32-S3 CAM PIR Sensor Telegram
+# ESP32-S3 Camera, PIR Motion Detection & Telegram Alerts
 
-ESP32-S3 camera firmware project using ESP-IDF/PlatformIO.
+[![Development Status](https://img.shields.io/badge/status-in%20development-orange?style=for-the-badge)](#project-status)
+[![PlatformIO](https://img.shields.io/badge/PlatformIO-ESP--IDF-orange?style=for-the-badge&logo=platformio&logoColor=white)](https://platformio.org/)
+[![ESP32-S3](https://img.shields.io/badge/Hardware-ESP32--S3-E7352C?style=for-the-badge&logo=espressif&logoColor=white)](https://www.espressif.com/en/products/socs/esp32-s3)
+[![LinkedIn Demo](https://img.shields.io/badge/LinkedIn-View%20Demo-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://lnkd.in/p/gA9THYsg)
 
-Current firmware behavior:
-- Starts a Wi-Fi Access Point (AP)
-- Runs an HTTP server on port 80
-- Shows a live MJPEG stream
-- Supports single JPEG snapshot capture
+An embedded camera project built around the **ESP32-S3**, using ESP-IDF through PlatformIO to provide a local Wi-Fi camera interface, live MJPEG streaming, and JPEG snapshot capture.
+
+The project is intended to evolve into an IoT motion-monitoring system with PIR-triggered image capture and Telegram notifications.
+
+> **Current implementation:** Local Wi-Fi access point, HTTP server, live camera streaming, and snapshot capture. PIR integration and Telegram messaging are planned extensions.
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Project Status](#project-status)
+- [Features](#features)
+- [System Architecture](#system-architecture)
+- [Hardware Requirements](#hardware-requirements)
+- [Camera Pin Configuration](#camera-pin-configuration)
+- [Wi-Fi Configuration](#wi-fi-configuration)
+- [Technology Stack](#technology-stack)
+- [Getting Started](#getting-started)
+- [HTTP API](#http-api)
+- [Testing](#testing)
+- [Troubleshooting](#troubleshooting)
+- [Roadmap](#roadmap)
+- [Security Considerations](#security-considerations)
+- [Demo](#demo)
+- [License](#license)
+
+## Overview
+
+This project explores embedded firmware development for camera-enabled IoT applications using the ESP32-S3 and the ESP-IDF framework.
+
+The firmware creates a standalone Wi-Fi access point, allowing a phone or computer to connect directly to the board and access a browser-based camera interface without requiring an external router.
+
+The current implementation provides:
+
+- Camera initialization using an OV2640-compatible pin configuration.
+- Wi-Fi access point operation.
+- An HTTP server listening on port `80`.
+- Live MJPEG video streaming.
+- Single JPEG image capture.
+- A built-in web interface for camera access.
+
+The planned direction is to integrate a PIR motion sensor and a Telegram bot to build a more complete embedded surveillance and motion-alert system.
 
 ## Project Status
 
-This repository name mentions PIR sensor and Telegram integration, but the current `main/main.c` implementation focuses on camera streaming over local Wi-Fi AP.
+| Component | Status |
+|---|---|
+| ESP32-S3 camera initialization | Implemented |
+| Wi-Fi AP mode | Implemented |
+| HTTP server | Implemented |
+| Live MJPEG stream | Implemented |
+| JPEG snapshot endpoint | Implemented |
+| Browser-based camera interface | Implemented |
+| PIR motion detection | Planned |
+| Motion-triggered image capture | Planned |
+| Telegram bot notifications | Planned |
+| Secure credential configuration | Planned |
 
-Planned modules like PIR trigger handling and Telegram messaging can be added next.
+**Development stage:** Initial camera-streaming implementation.
+
+The repository name describes the intended complete system, while the current firmware focuses on the camera and local web interface.
 
 ## Features
 
-- ESP32-S3 camera initialization (OV2640-style pin map)
-- AP mode Wi-Fi hosting (`192.168.4.1`)
-- Live stream endpoint: `/stream`
-- Snapshot endpoint: `/capture`
-- Simple built-in web UI at `/`
+### Implemented
 
-## Hardware
+- **Embedded camera firmware:** Camera initialization and frame capture.
+- **Standalone Wi-Fi:** Connect directly to the ESP32-S3 access point.
+- **HTTP camera interface:** Access the camera through a browser.
+- **MJPEG streaming:** View a sequence of JPEG frames through `/stream`.
+- **Snapshot capture:** Retrieve a single JPEG image through `/capture`.
+- **Browser interface:** Open the homepage to access the camera.
 
-- ESP32-S3 board with camera support
-- OV2640-compatible camera module
-- 5V USB power source
+### Planned
 
-Optional for future expansion:
-- PIR motion sensor
+- PIR sensor input for motion detection.
+- Motion-triggered image capture.
+- Telegram Bot API integration.
+- Event notifications with captured images.
+- Improved credential management and access control.
 
-## Default Camera Pin Map
+## System Architecture
 
-Defined in `main/main.c`:
+### Current implementation
 
-- `CAM_PIN_XCLK = 15`
-- `CAM_PIN_SIOD = 4`
-- `CAM_PIN_SIOC = 5`
-- `CAM_PIN_D7 = 16`
-- `CAM_PIN_D6 = 17`
-- `CAM_PIN_D5 = 18`
-- `CAM_PIN_D4 = 12`
-- `CAM_PIN_D3 = 10`
-- `CAM_PIN_D2 = 8`
-- `CAM_PIN_D1 = 9`
-- `CAM_PIN_D0 = 11`
-- `CAM_PIN_VSYNC = 6`
-- `CAM_PIN_HREF = 7`
-- `CAM_PIN_PCLK = 13`
+```text
+        Phone / Laptop
+               |
+          Wi-Fi Access
+               |
+       ESP32-S3 Access Point
+               |
+        Embedded HTTP Server
+               |
+       ESP32-S3 Camera Module
+               |
+        JPEG Frame Capture
+               |
+        +------+------+
+        |             |
+    MJPEG Stream   JPEG Snapshot
+      /stream       /capture
+```
 
-If your board uses a different schematic, update these values before flashing.
+### Planned motion-alert architecture
 
-## Wi-Fi AP Defaults
+```text
+      PIR Motion Sensor
+               |
+          ESP32-S3 GPIO
+               |
+       Motion Event Logic
+               |
+       Capture Camera Image
+               |
+       Wi-Fi Connectivity
+               |
+       Telegram Bot API
+               |
+       Telegram Notification
+```
 
-Also in `main/main.c`:
+The second diagram represents the planned extension, not the current firmware behavior.
 
-- SSID: `bunleab`
-- Password: `12345678`
-- AP IP: `192.168.4.1`
+## Hardware Requirements
 
-Change these credentials before production use.
+| Component | Purpose |
+|---|---|
+| ESP32-S3 development board | Main embedded controller |
+| OV2640-compatible camera | Image acquisition |
+| USB cable and suitable power source | Programming and power |
+| PIR motion sensor (optional) | Planned motion detection |
 
-## Build Environment
+Hardware compatibility depends on the specific ESP32-S3 board, camera connector, pin assignments, and power requirements.
 
-`platformio.ini` is configured for:
+## Camera Pin Configuration
+
+The following GPIO assignments are currently defined in `main/main.c`.
+
+| Camera Signal | ESP32-S3 GPIO |
+|---|---:|
+| XCLK | 15 |
+| SIOD | 4 |
+| SIOC | 5 |
+| D7 | 16 |
+| D6 | 17 |
+| D5 | 18 |
+| D4 | 12 |
+| D3 | 10 |
+| D2 | 8 |
+| D1 | 9 |
+| D0 | 11 |
+| VSYNC | 6 |
+| HREF | 7 |
+| PCLK | 13 |
+
+**Important:** Verify these assignments against your board schematic before flashing the firmware. Camera pin mappings are board-specific.
+
+## Wi-Fi Configuration
+
+The current firmware uses the following access point configuration:
+
+| Parameter | Default |
+|---|---|
+| SSID | `bunleab` |
+| Password | `12345678` |
+| IP address | `192.168.4.1` |
+| HTTP port | `80` |
+
+These values describe the current configuration, not recommended production credentials.
+
+Change the default password and avoid committing real credentials to a public repository.
+
+## Technology Stack
+
+[![C](https://img.shields.io/badge/Language-C-A8B9CC?style=flat&logo=c&logoColor=black)](https://en.cppreference.com/w/c)
+[![ESP-IDF](https://img.shields.io/badge/Framework-ESP--IDF-E7352C?style=flat&logo=espressif&logoColor=white)](https://docs.espressif.com/projects/esp-idf/en/stable/esp32s3/)
+[![PlatformIO](https://img.shields.io/badge/Build-PlatformIO-orange?style=flat&logo=platformio&logoColor=white)](https://platformio.org/)
+[![Wi-Fi](https://img.shields.io/badge/Connectivity-Wi--Fi-blue?style=flat)](https://www.espressif.com/en/solutions/low-power-connectivity/wi-fi)
+[![HTTP](https://img.shields.io/badge/Protocol-HTTP-lightgrey?style=flat)](https://developer.mozilla.org/en-US/docs/Web/HTTP)
+
+- **Programming language:** C
+- **Microcontroller:** ESP32-S3
+- **Firmware framework:** ESP-IDF
+- **Development environment:** VS Code and PlatformIO
+- **Camera:** OV2640-compatible module
+- **Networking:** Wi-Fi access point
+- **Application protocol:** HTTP
+- **Video delivery:** MJPEG over HTTP
+- **Image format:** JPEG
+
+The project configuration includes the `espressif/esp32-camera` component.
+
+## Getting Started
+
+### Prerequisites
+
+Install:
+
+1. [Visual Studio Code](https://code.visualstudio.com/)
+2. [PlatformIO IDE extension](https://platformio.org/install/ide?install=vscode)
+3. A compatible ESP32-S3 board with a camera.
+4. A USB cable capable of data transfer.
+
+### Project Configuration
+
+The `platformio.ini` configuration specifies:
 
 - Platform: `espressif32`
 - Board: `esp32-s3-devkitc-1`
 - Framework: `espidf`
 
-Dependencies:
+Check that the selected board matches your hardware before building.
 
-- `espressif/esp32-camera`
+### Build Firmware
 
-## Build and Flash (PlatformIO)
-
-1. Install VS Code + PlatformIO extension.
-2. Open this folder in VS Code.
-3. Connect your ESP32-S3 board over USB.
-4. Build:
+Open the project directory in VS Code, then run:
 
 ```bash
 pio run
 ```
 
-5. Flash:
+### Flash the Board
+
+Connect the ESP32-S3 through USB and run:
 
 ```bash
 pio run -t upload
 ```
 
-6. Open serial monitor:
+If automatic flashing fails, select the correct serial port or follow your board's bootloader instructions.
+
+### Open the Serial Monitor
 
 ```bash
 pio device monitor -b 115200
 ```
 
-## Run and Test
+Use the serial output to inspect startup messages, Wi-Fi initialization, and camera errors.
 
-1. Power/reset the board after flashing.
-2. Connect phone/laptop to Wi-Fi AP `bunleab`.
-3. Open:
+## HTTP API
+
+The embedded HTTP server currently exposes the following endpoints.
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/` | Browser-based camera interface |
+| `GET` | `/stream` | Multipart MJPEG video stream |
+| `GET` | `/capture` | Single JPEG snapshot |
+
+### Access the Camera
+
+After flashing the firmware:
+
+1. Power on or reset the board.
+2. Connect your phone or laptop to the `bunleab` Wi-Fi network.
+3. Open the following address in a browser:
 
 ```text
 http://192.168.4.1
 ```
 
-4. Verify:
-- Live image appears on homepage
-- Snapshot button opens `/capture`
+4. Use the homepage to view the camera stream.
+5. Test the snapshot endpoint directly:
 
-## HTTP Endpoints
+```text
+http://192.168.4.1/capture
+```
 
-- `GET /` - Web interface
-- `GET /stream` - Multipart MJPEG stream
-- `GET /capture` - Single JPEG image
+To access the live stream directly:
+
+```text
+http://192.168.4.1/stream
+```
+
+These addresses are intended for devices connected to the ESP32-S3 access point.
+
+## Testing
+
+Use this checklist to verify the current firmware.
+
+- [ ] Firmware builds successfully.
+- [ ] ESP32-S3 boots without camera initialization errors.
+- [ ] The Wi-Fi access point becomes visible.
+- [ ] A phone or laptop can connect to the access point.
+- [ ] The homepage loads successfully.
+- [ ] The MJPEG stream displays camera frames.
+- [ ] The snapshot endpoint returns a JPEG image.
+
+PIR and Telegram tests should be added after those modules have been implemented.
 
 ## Troubleshooting
 
-- Black image / no stream:
-	- Verify camera pin mapping matches your board
-	- Check camera ribbon cable orientation
-	- Confirm adequate power supply
-- AP not visible:
-	- Check serial logs for Wi-Fi startup messages
-	- Reboot board and re-scan networks
-- Upload fails:
-	- Verify serial port and cable
-	- Hold BOOT button while flashing if required by board
+### Black image or missing stream
 
-## Next Steps
+- Verify the camera pin mapping.
+- Check the camera ribbon cable orientation.
+- Confirm the camera is supported by the selected component configuration.
+- Check the serial logs for initialization errors.
+- Verify that the power source can handle the board and camera.
 
-- Add PIR sensor GPIO interrupt logic
-- Capture and upload alert image on motion
-- Integrate Telegram Bot API notifications
-- Move credentials to safer config strategy
+### Wi-Fi access point is not visible
+
+- Check the serial monitor for Wi-Fi startup errors.
+- Confirm that the board has booted successfully.
+- Reset the board and scan for networks again.
+- Verify the configured SSID and Wi-Fi mode.
+
+### Firmware upload fails
+
+- Check the USB cable and serial port.
+- Close applications that may be using the serial device.
+- Hold the BOOT button if required by the board.
+- Confirm the PlatformIO board configuration.
+
+### Camera streaming is unstable
+
+- Inspect the available heap and PSRAM configuration.
+- Review camera frame size and frame-buffer settings.
+- Check power stability and serial logs.
+- Test the stream and snapshot endpoints separately.
+
+## Roadmap
+
+### Phase 1 — Camera Streaming
+
+- [x] Initialize the camera.
+- [x] Start a local Wi-Fi access point.
+- [x] Serve a browser-based interface.
+- [x] Implement MJPEG streaming.
+- [x] Implement JPEG snapshot capture.
+
+### Phase 2 — PIR Motion Detection
+
+- [ ] Connect a PIR sensor to a suitable GPIO.
+- [ ] Implement motion-event handling.
+- [ ] Add configurable motion detection behavior.
+- [ ] Capture an image when motion is detected.
+- [ ] Test repeated triggers and false activations.
+
+### Phase 3 — Telegram Integration
+
+- [ ] Configure Telegram Bot API access.
+- [ ] Establish outbound network connectivity.
+- [ ] Send text notifications when motion is detected.
+- [ ] Upload captured images to Telegram.
+- [ ] Handle network failures and API errors.
+
+### Phase 4 — Reliability and Security
+
+- [ ] Remove default credentials.
+- [ ] Store secrets outside tracked source files.
+- [ ] Add appropriate access controls.
+- [ ] Improve connection recovery and error handling.
+- [ ] Document hardware-specific configurations.
+- [ ] Add repeatable integration tests.
+
+## Security Considerations
+
+This project is currently intended for development and local testing.
+
+Before using it in a real environment:
+
+- Replace the default Wi-Fi password.
+- Do not commit Wi-Fi passwords or Telegram bot tokens.
+- Remember that a local HTTP server without authentication may expose the camera to anyone connected to the access point.
+- Protect Telegram credentials and avoid printing secrets in logs.
+- Use authenticated and encrypted communication for any future remote-access design.
+
+## Demo
+
+View the project demo on LinkedIn:
+
+[![Watch Demo on LinkedIn](https://img.shields.io/badge/Watch%20Project%20Demo-LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://lnkd.in/p/gA9THYsg)
+
+**Demo link:** https://lnkd.in/p/gA9THYsg
 
 ## License
 
-Choose and add a license file if you plan to share this project publicly.
+No license has been specified yet. If you intend to publish or distribute this project, choose an appropriate open-source license and add the corresponding `LICENSE` file.
+
+---
+
+**Project focus:** Embedded Systems · Firmware Engineering · ESP-IDF · IoT Camera Systems · Motion Monitoring · Telegram Automation
+
+Built as an ongoing embedded systems development project.
